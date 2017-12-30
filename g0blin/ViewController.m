@@ -118,16 +118,16 @@ static uint64_t kbase;
         
         kbase = kslide + 0xFFFFFFF007004000;
         LOG("kern base -> 0x%llx", kbase);
-        //[self log:@"Patching com.apple.System.boot-nonce"];
-        //int nv_err = nvpatch(tfp0, kbase, "com.apple.System.boot-nonce");
-        //if(nv_err)
-        //{
-        //    [self log:@"Patching failed"];
-        //}
-        //else
-        //{
-        //    [self log:@"Patching successful"];
-        //}
+        [self log:@"Patching com.apple.System.boot-nonce"];
+        int nv_err = nvpatch(tfp0, kbase, "com.apple.System.boot-nonce");
+        if(nv_err)
+        {
+            [self log:@"Patching failed"];
+        }
+        else
+        {
+            [self log:@"Patching successful"];
+        }
         
         [self bypassKPP];
     });
