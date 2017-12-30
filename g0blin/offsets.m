@@ -120,6 +120,7 @@ kern_return_t init_offsets()
           OFFSET_ROP_ADD_X0_X0_0x10              = 0xfffffff0064b5174;
           OFFSET_OSSERIALIZER_SERIALIZE          = 0xfffffff00744d6ac;
           OFFSET_ROP_LDR_X0_X0_0x10              = 0xfffffff006404a84;
+		  OFFSET_ROOT_MOUNT_V_NODE				 = 0xfffffff0075b40b0;
 
 
       }
