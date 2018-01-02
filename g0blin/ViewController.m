@@ -34,6 +34,7 @@
 static task_t tfp0;
 static uint64_t kslide;
 static uint64_t kbase;
+static uint64_t kcred;
 
 
 @implementation ViewController
@@ -112,7 +113,7 @@ static uint64_t kbase;
     
     [self log:@"exploiting kernel"];
     
-    kern_return_t ret = v0rtex(&tfp0, &kslide);
+    kern_return_t ret = v0rtex(&tfp0, &kslide, &kcred);
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
@@ -130,6 +131,9 @@ static uint64_t kbase;
         
         kbase = kslide + 0xFFFFFFF007004000;
         LOG("kern base -> 0x%llx", kbase);
+
+        LOG("kern cred -> 0x%llx", kcred);
+
         [self log:@"Patching com.apple.System.boot-nonce"];
         int nv_err = nvpatch(tfp0, kbase, "com.apple.System.boot-nonce");
         if(nv_err)
@@ -152,7 +156,7 @@ static uint64_t kbase;
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         
-        if (do_kpp(1, 0, kbase, kslide, tfp0) != KERN_SUCCESS) {
+        if (do_kpp(1, 0, kbase, kslide, tfp0, kcred) != KERN_SUCCESS) {
             [self log:@"ERROR: kpp bypass failed \n"];
             return;
         }
@@ -213,12 +217,7 @@ static uint64_t kbase;
     LOG("reloading...");
     pid_t pid;
     posix_spawn(&pid, "/bin/launchctl", 0, 0, (char**)&(const char*[]){"/bin/launchctl", "load", "/Library/LaunchDaemons/0.reload.plist", NULL}, NULL);
-	waitpid(pid, 0, 0);
-	
-	// Respring
-	LOG("respringing...");
-	pid_t pid2;
-	posix_spawn(&pid2, "/usr/bin/killall", 0, 0, (char**)&(const char*[]){"/usr/bin/killall", -9, "SpringBoard", NULL}, NULL);
+    //waitpid(pid, 0, 0);
     
 }
 
